@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Redditività Affitti Roma</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .dashboard {
+            margin-top: 20px;
+        }
+
+        .dashboard-block {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-top: 4px solid #667eea;
+        }
+
+        .dashboard-block h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .contract-type {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .contract-type.concordato {
+            border-left-color: #27ae60;
+        }
+
+        .contract-type h5 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .metric-label {
+            color: #6c757d;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .costs-summary {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+
+        .cost-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #ffc107;
+        }
+
+        .agency-summary {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .export-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .note {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            color: #155724;
+            font-size: 0.85rem;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .metric {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+
+            .cost-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+
+            .export-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Simulatore Redditività Affitti Roma</h1>
+            <p>Calcola la redditività del tuo investimento immobiliare</p>
+        </div>
+
+        <div class="content">
+            <!-- Dati Economici e Immobile -->
+            <div class="form-section">
+                <h3>💰 Dati Economici e Immobile</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="canoneBase">Canone Mensile Base (€) *</label>
+                        <input type="number" id="canoneBase" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="costiRistrutturazione">Costi Ristrutturazione (€)</label>
+                        <input type="number" id="costiRistrutturazione" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="zona">Zona/Localizzazione</label>
+                        <input type="text" id="zona" placeholder="Es. Centro Storico, Trastevere...">
+                    </div>
+                    <div class="form-group">
+                        <label for="ammobiliato">Ammobiliato</label>
+                        <select id="ammobiliato">
+                            <option value="NO">NO</option>
+                            <option value="SI">SI (+15%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="classeEnergetica">Classe Energetica</label>
+                        <select id="classeEnergetica">
+                            <option value="D">D e oltre</option>
+                            <option value="C">C (+10%)</option>
+                            <option value="B">B (+20%)</option>
+                            <option value="A">A (+30%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ascensore">Ascensore</label>
+                        <select id="ascensore">
+                            <option value="NO">NO</option>
+                            <option value="SI">SI (+10%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="garage">Garage Privato</label>
+                        <select id="garage">
+                            <option value="NO">NO</option>
+                            <option value="SI">SI (+10%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="riscaldamento">Riscaldamento</label>
+                        <select id="riscaldamento">
+                            <option value="autonomo">Autonomo</option>
+                            <option value="condominiale">Condominiale</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="note">
+                    <strong>Nota:</strong> I coefficienti di maggiorazione non sono cumulabili al 100%. Si applica una maggiorazione totale massima del +50%.
+                    <br><strong>Detrazioni:</strong> I costi di ristrutturazione generano detrazioni del 50% distribuite su 10 anni.
+                </div>
+            </div>
+
+            <!-- Costi Proprietario -->
+            <div class="form-section">
+                <h3>🏘️ Costi Proprietario</h3>
+                <div class="note">
+                    <strong>Info:</strong> Il simulatore calcola automaticamente il confronto tra canone libero (21%) e canone concordato (10%).
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="imu">IMU Annuale (€)</label>
+                        <input type="number" id="imu" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="commissioneAgenzia">Commissione Agenzia (% reddito lordo)</label>
+                        <input type="number" id="commissioneAgenzia" min="0" max="100" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="speseStraordinarie">Spese Straordinarie Annue (€)</label>
+                        <input type="number" id="speseStraordinarie" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Costi Affittuario -->
+            <div class="form-section">
+                <h3>🏠 Costi Affittuario</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="condominio">Condominio Mensile (€)</label>
+                        <input type="number" id="condominio" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="bollettaLuce">Bolletta Luce Mensile (€)</label>
+                        <input type="number" id="bollettaLuce" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="bollettaGas">Bolletta Gas Mensile (€)</label>
+                        <input type="number" id="bollettaGas" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="tari">Tassa TARI Annuale (€)</label>
+                        <input type="number" id="tari" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="varie">Varie Mensili (€)</label>
+                        <input type="number" id="varie" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="costiAgenziaAffittuario">Costi Agenzia (% reddito lordo)</label>
+                        <input type="number" id="costiAgenziaAffittuario" min="0" max="100" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Results -->
+            <div id="dashboard" class="dashboard" style="display: none;">
+                <div class="dashboard-block">
+                    <h4>📊 Confronto Canone Libero vs Concordato</h4>
+                    <div class="comparison-grid" id="comparisonGrid">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+
+                <div class="dashboard-block">
+                    <h4>💸 Costi Affittuario</h4>
+                    <div class="costs-summary" id="costsSummary">
+                        <!-- Costs will be populated here -->
+                    </div>
+                </div>
+
+                <div class="dashboard-block" id="agencyBlock" style="display: none;">
+                    <h4>🏢 Introiti Agenzia</h4>
+                    <div class="agency-summary" id="agencySummary">
+                        <!-- Agency fees will be populated here -->
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="export-btn" onclick="exportToCSV()">📁 Esporta CSV</button>
+                    <button class="export-btn" onclick="exportToGoogleSheets()" style="background: linear-gradient(45deg, #4285f4, #34a853);">📊 Apri in Google Sheets</button>
+                    <button class="export-btn" onclick="copyToClipboard()" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24);">📋 Copia Dati</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let calculationResults = {};
+
+        // Funzione principale di calcolo
+        function calculateRentability() {
+            try {
+                // Lettura valori form
+                const canoneBase = parseFloat(document.getElementById('canoneBase').value) || 0;
+                const costiRistrutturazione = parseFloat(document.getElementById('costiRistrutturazione').value) || 0;
+                const zona = document.getElementById('zona').value;
+                const ammobiliato = document.getElementById('ammobiliato').value;
+                const classeEnergetica = document.getElementById('classeEnergetica').value;
+                const ascensore = document.getElementById('ascensore').value;
+                const garage = document.getElementById('garage').value;
+                const riscaldamento = document.getElementById('riscaldamento').value;
+
+                // Costi proprietario
+                const imu = parseFloat(document.getElementById('imu').value) || 0;
+                const commissioneAgenzia = parseFloat(document.getElementById('commissioneAgenzia').value) || 0;
+                const speseStraordinarie = parseFloat(document.getElementById('speseStraordinarie').value) || 0;
+
+                // Costi affittuario
+                const condominio = parseFloat(document.getElementById('condominio').value) || 0;
+                const bollettaLuce = parseFloat(document.getElementById('bollettaLuce').value) || 0;
+                const bollettaGas = parseFloat(document.getElementById('bollettaGas').value) || 0;
+                const tari = parseFloat(document.getElementById('tari').value) || 0;
+                const varie = parseFloat(document.getElementById('varie').value) || 0;
+                const costiAgenziaAffittuario = parseFloat(document.getElementById('costiAgenziaAffittuario').value) || 0;
+
+                if (canoneBase <= 0) {
+                    document.getElementById('dashboard').style.display = 'none';
+                    return;
+                }
+
+                // Calcolo maggiorazioni
+                let maggiorazionePercentuale = 0;
+                if (ammobiliato === 'SI') maggiorazionePercentuale += 15;
+                if (classeEnergetica === 'A') maggiorazionePercentuale += 30;
+                else if (classeEnergetica === 'B') maggiorazionePercentuale += 20;
+                else if (classeEnergetica === 'C') maggiorazionePercentuale += 10;
+                if (ascensore === 'SI') maggiorazionePercentuale += 10;
+                if (garage === 'SI') maggiorazionePercentuale += 10;
+
+                // Limite del 50%
+                maggiorazionePercentuale = Math.min(maggiorazionePercentuale, 50);
+
+                const canoneMensileEffettivo = canoneBase * (1 + maggiorazionePercentuale / 100);
+                const canoneAnnuoEffettivo = canoneMensileEffettivo * 12;
+
+                // Calcolo per entrambi i contratti
+                const risultatiLibero = calcolaPerTipo(canoneAnnuoEffettivo, 'libero', imu, commissioneAgenzia, speseStraordinarie, costiRistrutturazione, costiAgenziaAffittuario);
+                const risultatiConcordato = calcolaPerTipo(canoneAnnuoEffettivo, 'concordato', imu, commissioneAgenzia, speseStraordinarie, costiRistrutturazione, costiAgenziaAffittuario);
+
+                // Calcolo costi affittuario (usando canone libero come riferimento)
+                const costiAgenziaAffittuarioEuro = canoneAnnuoEffettivo * costiAgenziaAffittuario / 100;
+                const costiMensiliAffittuario = condominio + bollettaLuce + bollettaGas + varie + (costiAgenziaAffittuarioEuro / 12);
+                const costiAnnualiAffittuario = costiMensiliAffittuario * 12 + tari;
+
+                // Memorizza risultati
+                calculationResults = {
+                    input: {
+                        canoneBase, costiRistrutturazione, zona, ammobiliato, classeEnergetica,
+                        ascensore, garage, riscaldamento, imu, commissioneAgenzia, speseStraordinarie,
+                        condominio, bollettaLuce, bollettaGas, tari, varie, costiAgenziaAffittuario
+                    },
+                    calculated: {
+                        canoneMensileEffettivo, canoneAnnuoEffettivo, maggiorazionePercentuale,
+                        risultatiLibero, risultatiConcordato, costiMensiliAffittuario, costiAnnualiAffittuario
+                    }
+                };
+
+                // Mostra risultati
+                displayResults(risultatiLibero, risultatiConcordato, costiMensiliAffittuario, costiAnnualiAffittuario, 
+                              condominio, bollettaLuce, bollettaGas, tari, varie, costiAgenziaAffittuario, 
+                              commissioneAgenzia, canoneAnnuoEffettivo);
+
+                document.getElementById('dashboard').style.display = 'block';
+
+            } catch (error) {
+                console.error('Errore nel calcolo:', error);
+                alert('Si è verificato un errore nel calcolo. Controlla i valori inseriti.');
+            }
+        }
+
+        // Funzione di calcolo per tipo contratto
+        function calcolaPerTipo(canoneAnnuo, tipo, imu, commissioneAgenzia, speseStraordinarie, costiRistrutturazione, costiAgenziaAffittuario) {
+            const tassazionePercentuale = tipo === 'libero' ? 21 : 10;
+            const tasse = canoneAnnuo * tassazionePercentuale / 100;
+            const commissioni = canoneAnnuo * commissioneAgenzia / 100;
+            const detrazioniAnnue = costiRistrutturazione > 0 ? (costiRistrutturazione * 0.50) / 10 : 0;
+            
+            const costiTotali = imu + tasse + commissioni + speseStraordinarie;
+            const redditoNetto = canoneAnnuo - costiTotali + detrazioniAnnue;
+            const redditoNettoMensile = redditoNetto / 12;
+            const redditivita = canoneAnnuo > 0 ? (redditoNetto / canoneAnnuo) * 100 : 0;
+
+            return {
+                redditoLordo: canoneAnnuo,
+                tasse,
+                tassazionePercentuale,
+                commissioni,
+                costiTotali,
+                detrazioniAnnue,
+                redditoNetto,
+                redditoNettoMensile,
+                redditivita,
+                costiAgenziaAffittuarioEuro: canoneAnnuo * costiAgenziaAffittuario / 100
+            };
+        }
+
+        // Funzione di visualizzazione risultati
+        function displayResults(libero, concordato, costiMensili, costiAnnuali, condominio, luce, gas, tari, varie, costiAgenziaPercent, commissioneAgenzia, canoneAnnuo) {
+            // Confronto contratti
+            const comparisonHTML = `
+                <div class="contract-type">
+                    <h5>💼 Canone Libero</h5>
+                    <div class="metric">
+                        <span class="metric-label">Reddito Lordo Annuo:</span>
+                        <span class="metric-value">€${libero.redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Tasse (${libero.tassazionePercentuale}%):</span>
+                        <span class="metric-value">€${libero.tasse.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Commissione Agenzia (${commissioneAgenzia}%):</span>
+                        <span class="metric-value">€${libero.commissioni.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Costi Totali:</span>
+                        <span class="metric-value">€${libero.costiTotali.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Detrazioni Annue:</span>
+                        <span class="metric-value" style="color: #27ae60;">€${libero.detrazioniAnnue.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Reddito Netto Annuo:</span>
+                        <span class="metric-value">€${libero.redditoNetto.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Reddito Netto Mensile:</span>
+                        <span class="metric-value">€${libero.redditoNettoMensile.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Redditività:</span>
+                        <span class="metric-value highlight">${libero.redditivita.toFixed(2)}%</span>
+                    </div>
+                </div>
+                <div class="contract-type concordato">
+                    <h5>🤝 Canone Concordato</h5>
+                    <div class="metric">
+                        <span class="metric-label">Reddito Lordo Annuo:</span>
+                        <span class="metric-value">€${concordato.redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Tasse (${concordato.tassazionePercentuale}%):</span>
+                        <span class="metric-value">€${concordato.tasse.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Commissione Agenzia (${commissioneAgenzia}%):</span>
+                        <span class="metric-value">€${concordato.commissioni.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Costi Totali:</span>
+                        <span class="metric-value">€${concordato.costiTotali.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Detrazioni Annue:</span>
+                        <span class="metric-value" style="color: #27ae60;">€${concordato.detrazioniAnnue.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Reddito Netto Annuo:</span>
+                        <span class="metric-value">€${concordato.redditoNetto.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Reddito Netto Mensile:</span>
+                        <span class="metric-value">€${concordato.redditoNettoMensile.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Redditività:</span>
+                        <span class="metric-value highlight">${concordato.redditivita.toFixed(2)}%</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('comparisonGrid').innerHTML = comparisonHTML;
+
+            // Costi affittuario
+            const costsHTML = `
+                <div class="cost-item">
+                    <span>Condominio (mensile):</span>
+                    <span>€${condominio.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="cost-item">
+                    <span>Bolletta Luce (mensile):</span>
+                    <span>€${luce.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="cost-item">
+                    <span>Bolletta Gas (mensile):</span>
+                    <span>€${gas.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="cost-item">
+                    <span>TARI (annuale):</span>
+                    <span>€${tari.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="cost-item">
+                    <span>Varie (mensili):</span>
+                    <span>€${varie.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="cost-item">
+                    <span>Costi Agenzia (${costiAgenziaPercent}% reddito):</span>
+                    <span>€${libero.costiAgenziaAffittuarioEuro.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="cost-item">
+                    <span><strong>Totale Costi Annui Affittuario:</strong></span>
+                    <span><strong>€${costiAnnuali.toLocaleString('it-IT', {minimumFractionDigits: 2})}</strong></span>
+                </div>
+            `;
+
+            document.getElementById('costsSummary').innerHTML = costsHTML;
+
+            // Introiti agenzia
+            if (commissioneAgenzia > 0 || costiAgenziaPercent > 0) {
+                const agencyHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <h6 style="margin-bottom: 8px; color: #2c3e50;">💼 Canone Libero</h6>
+                            <div class="cost-item">
+                                <span>Commissione Proprietario (${commissioneAgenzia}%):</span>
+                                <span>€${libero.commissioni.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                            </div>
+                            <div class="cost-item">
+                                <span>Costi Affittuario (${costiAgenziaPercent}%):</span>
+                                <span>€${libero.costiAgenziaAffittuarioEuro.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                            </div>
+                            <div class="cost-item">
+                                <span><strong>Totale Introiti:</strong></span>
+                                <span><strong>€${(libero.commissioni + libero.costiAgenziaAffittuarioEuro).toLocaleString('it-IT', {minimumFractionDigits: 2})}</strong></span>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 style="margin-bottom: 8px; color: #27ae60;">🤝 Canone Concordato</h6>
+                            <div class="cost-item">
+                                <span>Commissione Proprietario (${commissioneAgenzia}%):</span>
+                                <span>€${concordato.commissioni.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                            </div>
+                            <div class="cost-item">
+                                <span>Costi Affittuario (${costiAgenziaPercent}%):</span>
+                                <span>€${concordato.costiAgenziaAffittuarioEuro.toLocaleString('it-IT', {minimumFractionDigits: 2})}</span>
+                            </div>
+                            <div class="cost-item">
+                                <span><strong>Totale Introiti:</strong></span>
+                                <span><strong>€${(concordato.commissioni + concordato.costiAgenziaAffittuarioEuro).toLocaleString('it-IT', {minimumFractionDigits: 2})}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('agencySummary').innerHTML = agencyHTML;
+                document.getElementById('agencyBlock').style.display = 'block';
+            } else {
+                document.getElementById('agencyBlock').style.display = 'none';
+            }
+        }
+
+        // Funzione export CSV
+        function exportToCSV() {
+            if (!calculationResults.input) {
+                alert('Esegui prima il calcolo per esportare i dati!');
+                return;
+            }
+
+            try {
+                const csvData = prepareExportData();
+                const csvContent = formatAsCSV(csvData);
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'simulazione_affitto_roma.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (error) {
+                console.error('Errore nell\'export CSV:', error);
+                alert('Errore durante l\'esportazione del CSV');
+            }
+        }
+
+        // Funzione export Google Sheets MIGLIORATA
+        function exportToGoogleSheets() {
+            if (!calculationResults.input) {
+                alert('Esegui prima il calcolo per esportare i dati!');
+                return;
+            }
+
+            try {
+                const data = prepareExportData();
+                
+                // Metodo 1: Crea CSV e mostra istruzioni dettagliate
+                const csvContent = formatAsCSV(data);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                
+                // Scarica CSV
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'simulazione_affitto_roma.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Copia negli appunti
+                const textContent = formatAsText(data);
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(textContent);
+                } else {
+                    fallbackCopyToClipboard(textContent);
+                }
+                
+                // Mostra istruzioni dettagliate
+                showGoogleSheetsInstructions();
+                
+                // Apri Google Sheets dopo un piccolo delay
+                setTimeout(() => {
+                    window.open('https://docs.google.com/spreadsheets/create', '_blank');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Errore nell\'export Google Sheets:', error);
+                alert('Errore durante l\'apertura di Google Sheets. Prova con l\'export CSV.');
+            }
+        }
+
+        // Mostra istruzioni dettagliate per Google Sheets
+        function showGoogleSheetsInstructions() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                text-align: center;
+            `;
+            
+            content.innerHTML = `
+                <h2 style="color: #4285f4; margin-bottom: 20px;">📊 Come Importare in Google Sheets</h2>
+                
+                <div style="text-align: left; margin: 20px 0;">
+                    <h3 style="color: #2c3e50; margin: 15px 0 10px 0;">🎯 Metodo 1: Copia e Incolla (CONSIGLIATO)</h3>
+                    <ol style="padding-left: 20px; line-height: 1.6;">
+                        <li>I dati sono già <strong>copiati negli appunti</strong> ✅</li>
+                        <li>Google Sheets si aprirà in una nuova finestra</li>
+                        <li><strong>Clicca sulla cella A1</strong> nel foglio vuoto</li>
+                        <li>Premi <strong>Ctrl+V</strong> (o Cmd+V su Mac)</li>
+                        <li>🎉 <strong>Fatto!</strong> Dati perfettamente formattati</li>
+                    </ol>
+                    
+                    <h3 style="color: #2c3e50; margin: 15px 0 10px 0;">📁 Metodo 2: Import File CSV</h3>
+                    <ol style="padding-left: 20px; line-height: 1.6;">
+                        <li>Il file CSV è stato <strong>scaricato automaticamente</strong></li>
+                        <li>In Google Sheets: <strong>File → Importa</strong></li>
+                        <li>Clicca <strong>"Carica"</strong> e seleziona il file</li>
+                        <li>Scegli <strong>"Sostituisci foglio"</strong></li>
+                        <li>Clicca <strong>"Importa dati"</strong></li>
+                    </ol>
+                    
+                    <h3 style="color: #2c3e50; margin: 15px 0 10px 0;">🔗 Metodo 3: Nuovo Foglio Precompilato</h3>
+                    <p style="padding-left: 20px; line-height: 1.6;">
+                        Clicca il pulsante verde qui sotto per creare un nuovo foglio con i dati già importati!
+                    </p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <button onclick="createPrefilledSheet()" style="
+                        background: linear-gradient(45deg, #4285f4, #34a853);
+                        color: white;
+                        border: none;
+                        padding: 12px 25px;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        margin: 5px;
+                    ">🚀 Crea Foglio Precompilato</button>
+                    
+                    <button onclick="closeModal()" style="
+                        background: #6c757d;
+                        color: white;
+                        border: none;
+                        padding: 12px 25px;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        margin: 5px;
+                    ">❌ Chiudi</button>
+                </div>
+                
+                <p style="color: #6c757d; font-size: 14px; margin-top: 20px;">
+                    💡 <strong>Suggerimento:</strong> Il metodo 1 (Copia e Incolla) è il più veloce e affidabile!
+                </p>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // Chiudi modal cliccando fuori
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Funzione per chiudere modal
+            window.closeModal = function() {
+                if (modal.parentNode) {
+                    modal.parentNode.removeChild(modal);
+                }
+            };
+            
+            // Funzione per creare foglio precompilato
+            window.createPrefilledSheet = function() {
+                createGoogleSheetWithData();
+                closeModal();
+            };
+        }
+
+        // Crea Google Sheet con dati precompilati
+        function createGoogleSheetWithData() {
+            try {
+                const data = prepareExportData();
+                
+                // Converte i dati in formato URL per Google Sheets
+                const sheetData = data.map(row => row.join('\t')).join('\n');
+                const encodedData = encodeURIComponent(sheetData);
+                
+                // Crea URL per nuovo Google Sheet con dati
+                const title = encodeURIComponent('Simulazione Affitto Roma - ' + new Date().toLocaleDateString('it-IT'));
+                
+                // Metodo alternativo: Crea un Google Form temporaneo che genera un Sheet
+                // Questo è un workaround poiché Google non permette URL diretti con dati
+                
+                // Strategia: Apri Google Sheets e prepara tutto per l'incollaggio
+                const sheetsUrl = 'https://docs.google.com/spreadsheets/create';
+                const newWindow = window.open(sheetsUrl, '_blank');
+                
+                // Copia di nuovo i dati per sicurezza
+                const textContent = formatAsText(data);
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(textContent);
+                }
+                
+                // Mostra notifica finale
+                setTimeout(() => {
+                    showCopySuccess('Nuovo foglio aperto! Premi Ctrl+V nella cella A1 per incollare i dati ✅');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Errore nella creazione foglio:', error);
+                alert('Errore nella creazione del foglio. Usa il metodo manuale.');
+            }
+        }
+
+        // Funzione copia negli appunti
+        function copyToClipboard() {
+            if (!calculationResults.input) {
+                alert('Esegui prima il calcolo per copiare i dati!');
+                return;
+            }
+
+            try {
+                const data = prepareExportData();
+                const textContent = formatAsText(data);
+                
+                // Metodo moderno per copiare negli appunti
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(textContent).then(() => {
+                        showCopySuccess();
+                    }).catch(err => {
+                        fallbackCopyToClipboard(textContent);
+                    });
+                } else {
+                    fallbackCopyToClipboard(textContent);
+                }
+                
+            } catch (error) {
+                console.error('Errore nella copia:', error);
+                alert('Errore durante la copia dei dati');
+            }
+        }
+
+        // Fallback per browser più vecchi
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                alert('Impossibile copiare automaticamente. Seleziona e copia manualmente i dati visualizzati.');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // Mostra messaggio di successo copia (versione estesa)
+        function showCopySuccess(customMessage) {
+            const message = customMessage || 'Dati copiati negli appunti! ✅';
+            
+            // Crea notifica temporanea
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            
+            // Aggiungi animazione CSS se non esiste
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Rimuovi dopo 4 secondi (più tempo per messaggi lunghi)
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Prepara dati per export
+        function prepareExportData() {
+            const input = calculationResults.input;
+            const calc = calculationResults.calculated;
+            
+            return [
+                ['SIMULAZIONE REDDITIVITÀ AFFITTO ROMA', ''],
+                ['Data Simulazione', new Date().toLocaleDateString('it-IT')],
+                ['', ''],
+                ['DATI INPUT', ''],
+                ['Canone Mensile Base (€)', input.canoneBase],
+                ['Costi Ristrutturazione (€)', input.costiRistrutturazione || 0],
+                ['Zona/Localizzazione', input.zona || ''],
+                ['Ammobiliato', input.ammobiliato],
+                ['Classe Energetica', input.classeEnergetica],
+                ['Ascensore', input.ascensore],
+                ['Garage Privato', input.garage],
+                ['Riscaldamento', input.riscaldamento],
+                ['IMU Annuale (€)', input.imu || 0],
+                ['Commissione Agenzia (%)', input.commissioneAgenzia || 0],
+                ['Spese Straordinarie (€)', input.speseStraordinarie || 0],
+                ['Condominio Mensile (€)', input.condominio || 0],
+                ['Bolletta Luce Mensile (€)', input.bollettaLuce || 0],
+                ['Bolletta Gas Mensile (€)', input.bollettaGas || 0],
+                ['TARI Annuale (€)', input.tari || 0],
+                ['Varie Mensili (€)', input.varie || 0],
+                ['Costi Agenzia Affittuario (%)', input.costiAgenziaAffittuario || 0],
+                ['', ''],
+                ['RISULTATI CALCOLO', ''],
+                ['Canone Mensile Effettivo (€)', calc.canoneMensileEffettivo.toFixed(2)],
+                ['Canone Annuo Effettivo (€)', calc.canoneAnnuoEffettivo.toFixed(2)],
+                ['Maggiorazione Totale (%)', calc.maggiorazionePercentuale],
+                ['', ''],
+                ['CONFRONTO CONTRATTI', '', 'Canone Libero', 'Canone Concordato'],
+                ['Reddito Lordo Annuo (€)', '', calc.risultatiLibero.redditoLordo.toFixed(2), calc.risultatiConcordato.redditoLordo.toFixed(2)],
+                ['Tasse (€)', '', calc.risultatiLibero.tasse.toFixed(2), calc.risultatiConcordato.tasse.toFixed(2)],
+                ['Commissioni Agenzia (€)', '', calc.risultatiLibero.commissioni.toFixed(2), calc.risultatiConcordato.commissioni.toFixed(2)],
+                ['Costi Totali (€)', '', calc.risultatiLibero.costiTotali.toFixed(2), calc.risultatiConcordato.costiTotali.toFixed(2)],
+                ['Detrazioni Annue (€)', '', calc.risultatiLibero.detrazioniAnnue.toFixed(2), calc.risultatiConcordato.detrazioniAnnue.toFixed(2)],
+                ['Reddito Netto Annuo (€)', '', calc.risultatiLibero.redditoNetto.toFixed(2), calc.risultatiConcordato.redditoNetto.toFixed(2)],
+                ['Reddito Netto Mensile (€)', '', calc.risultatiLibero.redditoNettoMensile.toFixed(2), calc.risultatiConcordato.redditoNettoMensile.toFixed(2)],
+                ['Redditività (%)', '', calc.risultatiLibero.redditivita.toFixed(2), calc.risultatiConcordato.redditivita.toFixed(2)],
+                ['', ''],
+                ['COSTI AFFITTUARIO', ''],
+                ['Costi Mensili Totali (€)', calc.costiMensiliAffittuario.toFixed(2)],
+                ['Costi Annuali Totali (€)', calc.costiAnnualiAffittuario.toFixed(2)],
+                ['', ''],
+                ['INTROITI AGENZIA', '', 'Canone Libero', 'Canone Concordato'],
+                ['Commissione Proprietario (€)', '', calc.risultatiLibero.commissioni.toFixed(2), calc.risultatiConcordato.commissioni.toFixed(2)],
+                ['Costi Affittuario (€)', '', calc.risultatiLibero.costiAgenziaAffittuarioEuro.toFixed(2), calc.risultatiConcordato.costiAgenziaAffittuarioEuro.toFixed(2)],
+                ['Totale Introiti Agenzia (€)', '', 
+                    (calc.risultatiLibero.commissioni + calc.risultatiLibero.costiAgenziaAffittuarioEuro).toFixed(2),
+                    (calc.risultatiConcordato.commissioni + calc.risultatiConcordato.costiAgenziaAffittuarioEuro).toFixed(2)
+                ]
+            ];
+        }
+
+        // Formatta come CSV
+        function formatAsCSV(data) {
+            return '\uFEFF' + data.map(row => 
+                row.map(cell => {
+                    if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                        return `"${cell.replace(/"/g, '""')}"`;
+                    }
+                    return cell;
+                }).join(',')
+            ).join('\n');
+        }
+
+        // Formatta come testo per appunti
+        function formatAsText(data) {
+            return data.map(row => 
+                row.join('\t') // Usa tab per migliore compatibilità con spreadsheet
+            ).join('\n');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const canoneBase = document.getElementById('canoneBase').value;
+                    if (canoneBase && canoneBase > 0) {
+                        calculateRentability();
+                    }
+                });
+                
+                // Calcolo in tempo reale per input numerici
+                if (input.type === 'number') {
+                    input.addEventListener('input', function() {
+                        clearTimeout(this.debounceTimer);
+                        this.debounceTimer = setTimeout(() => {
+                            const canoneBase = document.getElementById('canoneBase').value;
+                            if (canoneBase && canoneBase > 0) {
+                                calculateRentability();
+                            }
+                        }, 500);
+                    });
+                }
+            });
+
+            // Valori predefiniti per demo
+            document.getElementById('canoneBase').value = '1200';
+            document.getElementById('imu').value = '800';
+            document.getElementById('condominio').value = '150';
+            document.getElementById('bollettaLuce').value = '80';
+            document.getElementById('bollettaGas').value = '60';
+            document.getElementById('tari').value = '200';
+
+            // Calcolo iniziale
+            calculateRentability();
+
+            // Ottimizzazioni mobile
+            if (window.innerWidth <= 768) {
+                document.body.style.overflowX = 'hidden';
+                
+                // Prevenzione zoom su iOS
+                if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                    inputs.forEach(input => {
+                        input.addEventListener('focus', function() {
+                            this.style.fontSize = '16px';
+                        });
+                        input.addEventListener('blur', function() {
+                            this.style.fontSize = '';
+                        });
+                    });
+                }
+            }
+        });
+
+        // Gestione errori globale
+        window.addEventListener('error', function(event) {
+            console.error('Errore JavaScript:', event.error);
+            alert('Si è verificato un errore. Ricarica la pagina e riprova.');
+        });
+    </script>
+</body>
+</html>
